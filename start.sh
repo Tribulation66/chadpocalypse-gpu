@@ -10,12 +10,19 @@ mkdir -p /workspace/logs /workspace/outputs/images /workspace/outputs/meshes /wo
 export HF_HOME=/workspace/hf_cache
 export PYTHONPATH="/content/TRELLIS.2:$PYTHONPATH"
 
-# ── Restore HuggingFace auth from workspace backup ──
+# ── HuggingFace Auth ──
+# Priority: 1) Existing token on volume  2) HF_TOKEN env var from template
 if [ -f /workspace/hf_cache/token ]; then
     mkdir -p /content/cache
     cp /workspace/hf_cache/token /content/cache/token 2>/dev/null
     cp -r /workspace/hf_cache/stored_tokens /content/cache/stored_tokens 2>/dev/null
     echo "[START] HuggingFace auth restored from workspace"
+elif [ -n "$HF_TOKEN" ]; then
+    mkdir -p /workspace/hf_cache
+    huggingface-cli login --token "$HF_TOKEN" 2>/dev/null
+    echo "[START] HuggingFace auth from HF_TOKEN env var"
+else
+    echo "[START] WARNING: No HuggingFace auth found. Gated models will fail."
 fi
 
 # ── Install deps (fast - most already cached) ──
