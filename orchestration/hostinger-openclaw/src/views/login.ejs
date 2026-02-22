@@ -1,0 +1,22 @@
+<%- include('layout/header') %>
+
+<div class="inner-container">
+    <img src="/openclaw.png" alt="OpenClaw" />
+
+    <h1>Welcome to OpenClaw</h1>
+</div>
+<% if (error) { %>
+    <div class="inner-container">
+        <div class="alert alert-error"><%= error %></div>
+    </div>
+<% } %>
+
+<div class="inner-container">
+    <form method="POST" action="/login">
+        <input type="password" name="token" placeholder="Enter your OpenClaw gateway token" autofocus />
+        <button type="submit">➜] Login</button>
+    </form>
+
+<a href="https://www.hostinger.com/support/how-to-find-your-openclaw-gateway-token-on-hostinger-vps/" target="_blank">Forgot your login token?</a>
+
+<%- include('layout/footer') %>

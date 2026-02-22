@@ -1,0 +1,34 @@
+<%- include('layout/header') %>
+
+<div class="inner-container">
+    <div class="alert alert-info">
+        AI Provider API keys are missing
+    </div>
+</div>
+<div class="inner-container">
+    <div class="card">
+        <p>To enable AI-powered responses, configure at least one API key from the providers below:</p>
+
+        <ul>
+            <li><strong>NEXOS_API_KEY</strong> - For Nexos.ai models</li>
+            <li><strong>OPENAI_API_KEY</strong> - For ChatGPT models</li>
+            <li><strong>ANTHROPIC_API_KEY</strong> - For Claude models</li>
+            <li><strong>GEMINI_API_KEY</strong> - For Gemini models</li>
+            <li><strong>XAI_API_KEY</strong> - For xAI models</li>
+        </ul>
+
+        <p>
+            💡 <strong>Tip:</strong> You can add multiple API keys to access different AI models. Without any provider configured, OpenClaw won't be able to generate responses.
+        </p>
+
+        <p style="margin-bottom: 24px;">
+            Need help? Check out our <a href="https://www.hostinger.com/support/how-to-install-openclaw-on-hostinger-vps/" target="_blank">setup guide</a> for step-by-step instructions.
+        </p>
+
+        <form style="margin-bottom: 0; text-align: center;" method="post" action="/confirm-no-model-keys">
+            <button type="submit">Continue Without AI</button>
+        </form>
+    </div>
+</div>
+
+<%- include('layout/footer') %>
