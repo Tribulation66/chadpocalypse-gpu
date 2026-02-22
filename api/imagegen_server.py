@@ -41,7 +41,7 @@ JOBS: Dict[str, dict] = {}
 MODELS = {
     "flux2-klein": {
         "repo": "black-forest-labs/FLUX.2-klein-4B",
-        "pipeline_cls": "Flux2Pipeline",
+        "pipeline_cls": "Flux2KleinPipeline",
         "steps": 4,
         "guidance": 1.0,
         "dtype": "bfloat16",
@@ -92,9 +92,9 @@ def load_model(name: str):
     dtype = torch.bfloat16 if cfg["dtype"] == "bfloat16" else torch.float16
     print(f"[IMGGEN] Loading {name} ({cfg['repo']})...")
 
-    if cfg["pipeline_cls"] == "Flux2Pipeline":
-        from diffusers import Flux2Pipeline
-        pipe = Flux2Pipeline.from_pretrained(cfg["repo"], torch_dtype=dtype)
+    if cfg["pipeline_cls"] == "Flux2KleinPipeline":
+        from diffusers import Flux2KleinPipeline
+        pipe = Flux2KleinPipeline.from_pretrained(cfg["repo"], torch_dtype=dtype)
     elif cfg["pipeline_cls"] == "FluxPipeline":
         from diffusers import FluxPipeline
         pipe = FluxPipeline.from_pretrained(cfg["repo"], torch_dtype=dtype)
@@ -104,7 +104,11 @@ def load_model(name: str):
     else:
         raise ValueError(f"Unknown pipeline: {cfg['pipeline_cls']}")
 
-    pipe.enable_model_cpu_offload()
+    # Flux2Klein can't use cpu_offload (meta tensor issue), load direct to GPU
+    if cfg['pipeline_cls'] == 'Flux2KleinPipeline':
+        pipe = pipe.to('cuda')
+    else:
+        pipe.enable_model_cpu_offload()
     CURRENT_PIPE = pipe
     CURRENT_MODEL = name
     print(f"[IMGGEN] {name} loaded and ready!")

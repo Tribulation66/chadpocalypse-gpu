@@ -27,7 +27,7 @@ fi
 
 # ── Install deps (fast - most already cached) ──
 pip install --break-system-packages fastapi uvicorn python-multipart aiofiles httpx \
-    diffusers transformers accelerate sentencepiece protobuf 2>/dev/null
+    git+https://github.com/huggingface/diffusers.git transformers accelerate sentencepiece protobuf 2>/dev/null
 
 # ── Launch TRELLIS.2 API (port 8000) ──
 if [ -f /workspace/api/trellis_server.py ]; then
