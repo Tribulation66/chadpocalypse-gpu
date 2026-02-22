@@ -81,3 +81,35 @@ The game's aesthetic is inspired by ULTRAKILL and Megabonk — pixelated texture
 - The pod takes 2-5 minutes to start. Warn the user.
 - If the API is not responding on a running pod, the API server may need to be started manually. Tell the user.
 - Image generation is fast (seconds). Mesh generation takes 15-60 seconds per mesh.
+
+## Discord attachments as reference images (SD3.5 IP-Adapter)
+
+### Problem
+Discord CDN attachment URLs are not reliable for RunPod to fetch (they can 404/expire or be inaccessible from other networks). `sd35-large` reference images must be reachable from the RunPod pod via a stable public URL.
+
+### Required behavior
+When a user sends an image attachment in Discord:
+
+1) Save the attachment into:
+- `/data/.openclaw/media/inbound/<filename>`
+
+2) Do **NOT** pass the Discord CDN URL to RunPod.
+Instead, pass the **local inbound path** to the RunPod image generation flow:
+- `reference_image_url=/data/.openclaw/media/inbound/<filename>`
+
+3) Convert the local inbound path to a stable public URL served by the VPS media server:
+- `http://187.77.50.70:9090/media/inbound/<filename>`
+
+Use that public URL when the GPU pod needs to fetch the image.
+
+### VPS media server requirements (Hostinger)
+Nginx serves `/media/` from `/var/www/media/` (alias). `/var/www/media` points to the OpenClaw media directory.
+
+To prevent 403 errors for new inbound files, `www-data` must have read/traverse permissions on inbound (including default ACLs for new files):
+- `setfacl -m u:www-data:rx -m d:u:www-data:rx /var/www/media/inbound`
+
+### Validation
+- From VPS: `curl -I http://127.0.0.1:9090/media/inbound/<filename>`
+- From outside: `curl -I http://187.77.50.70:9090/media/inbound/<filename>`
+
+If either returns 403/404, do not proceed with reference-image generation until fixed.
